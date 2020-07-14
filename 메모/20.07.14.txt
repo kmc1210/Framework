@@ -1,0 +1,134 @@
+에러메시지 1111 - null 값이 들어간게 문제
+
+
+ Alias 사용법 : 
+   mybatis config에서
+
+   <!--    <typeAliases> -->
+<!--       <typeAlias type="web.dto.Emp" alias = "Emp"/> -->
+<!--    </typeAliases>    -->
+   <!-- TypeAlias를 패키지 단위로 선언하는 방법 --> 클래스단위로 선언
+
+   똑같은 방법으로 패키지 단위로 선언할때
+
+   <typeAliases>
+      <package name="web.dto"/>
+   </typeAliases>
+
+   
+----------------------------------------------------------------------------------------   
+
+
+자바타입의 null과 sql의 null은 다름
+자바타입에서 object 타입의 null을 오라클에 넣으려고 할 때 sql의 null과 다르기 때문에
+에러가뜸
+
+에러메시지 : 부적합한 열 유형 : 1111 // null오류
+
+null값 처리방법 : 자바에서의 setNull처리방법 setNull(3,Types.VARCHAR);
+
+
+마이바티스 Mapper 자체에서의  Null처리방법 : 
+   <insert id="insert2" parameterType="map"> 
+      insert into emp(empno,ename,job)
+      values(#{e1},#{e2},#{e3,jdbcType=VARCHAR})
+   </insert>
+
+마이바티스 config에서의 Null 처리방법
+
+<settings>
+   <setting name = "jdbcTypeForNull" value = "NULL"/>
+</settings>   
+
+
+ 마이바티스에서 parameterType을 딱히 지정을 안해줘도 map형태로 들어감
+   #{e1} , #{e2} , #{e3}
+   #{} 내부에 있는것을 map형태 {key,value}형태로 넣어줌
+   parameterType을 DTO로 지정해준다면 알아서 .get으로 처리함
+   
+   
++ 마이바티스에서 NULL값 처리하기
+
+  - INSERT 나 UPDATE 쿼리를 이용할 때 NULL값을 입력/수정해야할 때가 있다
+  - 마이바티스에서는 NULL값을 입력하려고 할 때 JDBC타입을 명시해주어야 한다
+  - 타입을 명시하지 않으면 "부적합한 열 유형 : 1111" 같은 에러메시지가 발생함
+
++ NULL값 처리 방법1
+  - Mapper XML 파일에서 SQL쿼리를 작성할 때 파라미터 값에 각각 데이터타입을 명시함
+  
+    ex)     <insert id="insert">
+              INSERT INTO emp ( empno, ename )
+              VALUES ( #{empno}, #{ename, jdbcType=VARCHAR} )
+            </insert>
+
++ NULL값 처리 방법 2
+ - Configuration XML 파일에서 <settings>를 이용하여 전역 설정하기
+ 
+   ex)      //mybatis -config.xml 파일 내부
+            
+            ...
+            <settings>
+              <setting name="jdbcTypeForNull" value="NULL" />
+            </settings>  
+            ...
+   ** <properties> 밑에 <typeAliases> 위에 <settings> 태그를 둔다
+   
++ jdbcType에 설정할 수 있는 값
+  - VARCHAR, DATE, TIMESTAMP, INTEGER, CHAR, DOUBLE
+  
++ SELECT 태그에서 resultType으로 설정할 수 있는 값 (키워드)
+  
+  - DB 조회결과(ResultSet)를 Java의 어떤 데이터타입으로 변환하여 반환할 것인지
+    설정하는 속성값
+    
+  - 실제 DTO(객체)는 패키지포함하는 풀네임으로 적용할 수 있다
+    ( typeAlias 가능함 )
+    
+  - 미리 정의되어있는 키워드를 사용할 수 있다
+  
+  - org.apache.ibatis.type.TypeAliasRegistry 클래스에 명시되어있다
+  
+        키워드     자바 타입 
+        string     java.lang.String
+        date       java.util.Date
+        
+        map        java.util.Map
+        hashmap    java.util.HashMap
+        
+        list       java.util.List
+        arraylist  java.util.ArrayList
+        
+        ResultSet  java.sql.ResultSet
+        
+        ----------------------------------
+        
+        int        java.lang.Integer
+        integer    java.lang.Integer
+        
+        _int       int
+        _integer   int
+        
+        int[]      java.lang.Integer[]
+        _int[]     int[]
+        
+        byte       자바 기본타입 이름에 '_' 가 안붙어있으면 Wrapper 클래스 타입
+        short
+        long
+        
+        float
+        double
+        
+        boolean
+        
+        _byte     자바 기본타입 이름에 '_' 가 붙어있으면 기본 데이터 타입
+        _short
+        _long
+        
+        _float
+        _double
+        
+        _boolean
+  
+  
+  
+  - NULL
