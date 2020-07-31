@@ -1,0 +1,6 @@
+네이버 SMTP(Simple Mail Transfer Protocol) 사용하기
+네이버 로그인 > 네이버 메일함 > 내 메일함 > 톱니바퀴 클릭
+
+POP3/IMAP설정 클릭 > 확인
+SMTP : 25번포트(일반 smtp, 보안x)
+          465번 포트, 587번 포트(보안 0)
